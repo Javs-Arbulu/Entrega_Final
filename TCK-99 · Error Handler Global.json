@@ -1,0 +1,299 @@
+{
+  "name": "TCK-99 · Error Handler Global",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        848,
+        176
+      ],
+      "id": "f7762c80-e96e-4513-8798-e5aa7e3d7746",
+      "name": "TRG · Error Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const e = $input.first().json;\nreturn [{ json: {\n  run_id:   String(e.execution?.id ?? 'n-a'),\n  workflow: e.workflow?.name ?? 'desconocido',\n  nodo:     e.execution?.lastNodeExecuted ?? 'desconocido',\n  mensaje:  (e.execution?.error?.message ?? JSON.stringify(e.execution?.error ?? {})).slice(0, 900),\n  url:      e.execution?.url ?? '',\n}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        176
+      ],
+      "id": "f2f77497-4b36-4690-bb93-b81770ec7378",
+      "name": "CODE · Extraer Contexto Error"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app6VZNu6Sf0z8moD",
+          "mode": "list",
+          "cachedResultName": "Mesa de Ayuda IA",
+          "cachedResultUrl": "https://airtable.com/app6VZNu6Sf0z8moD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblMpNfg804UeoJ7O",
+          "mode": "list",
+          "cachedResultName": "Log_Ejecuciones",
+          "cachedResultUrl": "https://airtable.com/app6VZNu6Sf0z8moD/tblMpNfg804UeoJ7O"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Run ID": "={{ $json.run_id }}",
+            "Nodo": "={{ $json.nodo }}",
+            "Resultado": "Error",
+            "Modelo": "n-a",
+            "Mensaje Error": "=[GLOBAL] {{ $json.mensaje }}",
+            "Tokens In": 0,
+            "Tokens Out": 0,
+            "Costo USD": 0,
+            "Latencia ms": 0
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Run ID",
+              "displayName": "Run ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Ticket",
+              "displayName": "Ticket",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Nodo",
+              "displayName": "Nodo",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Resultado",
+              "displayName": "Resultado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "OK",
+                  "value": "OK"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "gpt-4o-mini",
+                  "value": "gpt-4o-mini"
+                },
+                {
+                  "name": "claude",
+                  "value": "claude"
+                },
+                {
+                  "name": "n-a",
+                  "value": "n-a"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tokens In",
+              "displayName": "Tokens In",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tokens Out",
+              "displayName": "Tokens Out",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Costo USD",
+              "displayName": "Costo USD",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Latencia ms",
+              "displayName": "Latencia ms",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Mensaje Error",
+              "displayName": "Mensaje Error",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1296,
+        176
+      ],
+      "id": "8dfda02b-1af7-4851-a36d-151e6004285c",
+      "name": "AT · Log Error Global",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kXziMmmXfbmxON2f",
+          "name": "Airtable account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "6533326466",
+        "text": "=🚨 *Fallo no controlado*\nWorkflow: {{ $json.workflow }}\nNodo: {{ $json.nodo }}\nEjecución: {{ $json.run_id }}\n\n{{ $json.mensaje }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1520,
+        176
+      ],
+      "id": "b108ce0a-8950-4f0b-82f7-76d748ab6198",
+      "name": "TG · Alerta Crítica",
+      "webhookId": "cf3be566-c47a-4522-b9a3-7ccc0a8ee17a",
+      "credentials": {
+        "telegramApi": {
+          "id": "XzhnnS9GD5a75Xjj",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "TRG · Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "CODE · Extraer Contexto Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODE · Extraer Contexto Error": {
+      "main": [
+        [
+          {
+            "node": "AT · Log Error Global",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AT · Log Error Global": {
+      "main": [
+        [
+          {
+            "node": "TG · Alerta Crítica",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4fd1c3a9-924a-4583-b84f-df4f4ffd2a97",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3f7a501cce7b17bbc24b8cfcba818bcf34ef294f738fb808d1f6b042da9083db"
+  },
+  "nodeGroups": [],
+  "id": "Xsbw1s4jwOeM1AfG",
+  "tags": []
+}
