@@ -1,0 +1,93 @@
+{
+  "titulo": "Transferencia · AI · Redactar Respuesta",
+  "endpoint": "POST https://api.cohere.com/v2/chat",
+  "modelo": "command-a-03-2025",
+  "justificacion": "Lectura densa: consume hasta 3 artículos completos de la base de conocimiento y debe sostener tono, restricciones de longitud y prohibición de inventar pasos. Es la tarea que justifica el modelo grande.",
+  "request": {
+    "model": "command-a-03-2025",
+    "temperature": 0.4,
+    "max_tokens": 700,
+    "messages": [
+      {
+        "role": "system",
+        "content": "<reglas de redacción: 200 palabras, tono usted, solo KB, sin plazos, firma fija>"
+      },
+      {
+        "role": "user",
+        "content": "<hint de reintento si $runIndex>0> + datos del ticket + artículos de la KB"
+      }
+    ]
+  },
+  "response": "Mismo envoltorio que 03_cohere_clasificacion.json. El texto libre se extrae de message.content[0].text.",
+  "salida_util_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Salida de CODE · Extraer Borrador",
+    "type": "object",
+    "required": [
+      "borrador",
+      "intento",
+      "ticket_record_id",
+      "tokens_in",
+      "tokens_out",
+      "costo_usd",
+      "latencia_ms"
+    ],
+    "properties": {
+      "borrador": {
+        "type": "string",
+        "description": "Cuerpo del email. Falla el nodo si viene vacío."
+      },
+      "intento": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 2,
+        "description": "$runIndex + 1. Alimenta el filtro anti-bucle."
+      },
+      "ticket_record_id": {
+        "type": "string",
+        "pattern": "^rec[a-zA-Z0-9]{14}$"
+      },
+      "ticket_id": {
+        "type": "string",
+        "pattern": "^TCK-[0-9]{4}$"
+      },
+      "categoria": {
+        "type": "string"
+      },
+      "prioridad": {
+        "type": "string"
+      },
+      "articulos_count": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 3
+      },
+      "articulos_ids": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "pattern": "^rec[a-zA-Z0-9]{14}$"
+        }
+      },
+      "run_id": {
+        "type": "string"
+      },
+      "tokens_in": {
+        "type": "integer",
+        "description": "Real desde usage; si falta, estimado a 4 caracteres por token."
+      },
+      "tokens_out": {
+        "type": "integer"
+      },
+      "costo_usd": {
+        "type": "number",
+        "description": "tokens_in/1e6*PRECIO_IN + tokens_out/1e6*PRECIO_OUT"
+      },
+      "latencia_ms": {
+        "type": "integer",
+        "description": "Diferencia contra recibido_en. Latencia end-to-end, no del modelo."
+      }
+    }
+  },
+  "caso_sin_cobertura": "Si AT · Buscar Artículos KB no devuelve resultados, CODE · Armar Contexto KB envía la cadena 'SIN ARTÍCULOS RELEVANTES' y el prompt obliga al modelo a escalar en lugar de inventar pasos."
+}

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/USUARIO/REPO/schemas/01_webhook_entrada.schema.json",
+  "title": "Payload de entrada · TRG · Webhook Nuevo Ticket",
+  "description": "Contrato del formulario web hacia n8n. POST /webhook/ticket-nuevo. Requiere el header x-api-key (Header Auth). n8n entrega este objeto anidado bajo la clave 'body'.",
+  "type": "object",
+  "required": [
+    "nombre",
+    "email",
+    "empresa",
+    "plan",
+    "asunto",
+    "descripcion"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "nombre": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120,
+      "description": "Nombre del solicitante. NO se envía al modelo de IA."
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "maxLength": 200,
+      "description": "Clave de deduplicación en la tabla Clientes. Se normaliza a minúsculas y sin espacios. NO se envía al modelo de IA."
+    },
+    "empresa": {
+      "type": "string",
+      "maxLength": 160,
+      "description": "Organización del solicitante. NO se envía al modelo de IA."
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "Free",
+        "Pro",
+        "Enterprise"
+      ],
+      "description": "Determina qué artículos de la base de conocimiento son elegibles."
+    },
+    "asunto": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "descripcion": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 5000,
+      "description": "Cuerpo de la consulta. El mínimo de 20 caracteres lo valida IF · Validar Payload."
+    }
+  },
+  "examples": [
+    {
+      "nombre": "Laura Méndez",
+      "email": "laura.mendez@vertexlab.pe",
+      "empresa": "Vertex Lab",
+      "plan": "Enterprise",
+      "asunto": "La sincronización de contactos quedó a medias",
+      "descripcion": "Corrimos la sincronización anoche y de 4.200 contactos solo entraron 3.100. No aparece ningún mensaje de error en pantalla y no sabemos qué filas quedaron afuera."
+    }
+  ]
+}

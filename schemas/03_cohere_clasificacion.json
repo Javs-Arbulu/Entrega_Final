@@ -1,0 +1,168 @@
+{
+  "titulo": "Transferencia · AI · Clasificar Ticket",
+  "endpoint": "POST https://api.cohere.com/v2/chat",
+  "autenticacion": "Header Auth · Authorization: Bearer <COHERE_API_KEY>",
+  "modelo": "command-r7b-12-2024",
+  "justificacion": "Tarea estructurada de bajo razonamiento: clasificar en dominios cerrados y resumir en 30 palabras. No requiere el modelo grande.",
+  "minimizacion_de_datos": "El body incluye únicamente asunto, descripción y plan. Nombre, email y empresa nunca salen hacia el proveedor de IA.",
+  "request": {
+    "model": "command-r7b-12-2024",
+    "temperature": 0.2,
+    "max_tokens": 300,
+    "response_format": {
+      "type": "json_object"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "<prompt de triage con dominios cerrados e instrucción explícita de generar JSON>"
+      },
+      {
+        "role": "user",
+        "content": "Asunto: ...\nDescripción: ...\nPlan del cliente: ..."
+      }
+    ]
+  },
+  "response_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Respuesta de Cohere v2 (envoltorio)",
+    "type": "object",
+    "required": [
+      "message"
+    ],
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "finish_reason": {
+        "type": "string",
+        "examples": [
+          "COMPLETE",
+          "MAX_TOKENS"
+        ]
+      },
+      "message": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "const": "assistant"
+          },
+          "content": {
+            "type": "array",
+            "description": "Cohere v2 devuelve bloques, no un string. CODE · Validar Clasificación los aplana antes de parsear.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "const": "text"
+                },
+                "text": {
+                  "type": "string",
+                  "description": "JSON serializado con la clasificación"
+                }
+              }
+            }
+          }
+        }
+      },
+      "usage": {
+        "type": "object",
+        "description": "Consumo real. CODE · Extraer Borrador lo usa para calcular el costo por ticket registrado en Log_Ejecuciones.",
+        "properties": {
+          "billed_units": {
+            "type": "object",
+            "properties": {
+              "input_tokens": {
+                "type": "integer"
+              },
+              "output_tokens": {
+                "type": "integer"
+              }
+            }
+          },
+          "tokens": {
+            "type": "object",
+            "properties": {
+              "input_tokens": {
+                "type": "integer"
+              },
+              "output_tokens": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "payload_util_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Clasificación (contenido de message.content[0].text)",
+    "type": "object",
+    "required": [
+      "categoria",
+      "prioridad",
+      "sentimiento",
+      "resumen",
+      "confianza"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "categoria": {
+        "type": "string",
+        "enum": [
+          "Facturación",
+          "Bug técnico",
+          "Cómo hacer",
+          "Solicitud de función",
+          "Fuera de alcance"
+        ]
+      },
+      "prioridad": {
+        "type": "string",
+        "enum": [
+          "P1",
+          "P2",
+          "P3"
+        ]
+      },
+      "sentimiento": {
+        "type": "string",
+        "enum": [
+          "Neutro",
+          "Frustrado",
+          "Enojado"
+        ]
+      },
+      "resumen": {
+        "type": "string",
+        "maxLength": 300
+      },
+      "confianza": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      }
+    },
+    "examples": [
+      {
+        "categoria": "Bug técnico",
+        "prioridad": "P2",
+        "sentimiento": "Frustrado",
+        "resumen": "Sincronización parcial de contactos sin mensaje de error ni detalle de filas rechazadas.",
+        "confianza": 0.92
+      }
+    ]
+  },
+  "validacion_en_flujo": [
+    "Aplanado del array de bloques de contenido a string",
+    "Limpieza de cercos markdown (```json)",
+    "JSON.parse con captura de excepción",
+    "Verificación de los 5 campos obligatorios",
+    "Verificación de pertenencia a los dominios cerrados (evita que un valor inventado rompa el Single Select de Airtable)",
+    "Coerción de confianza a número y acotado a [0,1]"
+  ],
+  "ruta_de_error": "Cualquier fallo cae en la salida de error del nodo y termina en AT · Log Error IA + ticket en Estado=Error."
+}

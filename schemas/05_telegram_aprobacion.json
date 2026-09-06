@@ -1,0 +1,58 @@
+{
+  "titulo": "Transferencia · TG · Aprobar Respuesta (Human-in-the-loop)",
+  "mecanismo": "Operación sendAndWait del nodo Telegram. n8n suspende la ejecución y publica un webhook de reanudación; los botones inline apuntan a ese webhook. Requiere el workflow activo.",
+  "configuracion": {
+    "operation": "sendAndWait",
+    "responseType": "approval",
+    "approvalType": "double",
+    "limitWaitTime": true,
+    "resumeAmount": 24,
+    "resumeUnit": "hours"
+  },
+  "mensaje_enviado": {
+    "descripcion": "Markdown con ticket, prioridad, categoría, número de intento, cantidad de artículos usados, consulta original y borrador propuesto.",
+    "botones": [
+      "Approve",
+      "Decline"
+    ]
+  },
+  "payload_de_reanudacion_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Ítem que recibe IF · Aprobado",
+    "type": "object",
+    "required": [
+      "data"
+    ],
+    "properties": {
+      "data": {
+        "type": "object",
+        "required": [
+          "approved"
+        ],
+        "properties": {
+          "approved": {
+            "type": "boolean",
+            "description": "true = Approve, false = Decline"
+          }
+        }
+      }
+    },
+    "examples": [
+      {
+        "data": {
+          "approved": true
+        }
+      },
+      {
+        "data": {
+          "approved": false
+        }
+      }
+    ]
+  },
+  "consecuencias": {
+    "approved_true": "GM · Enviar Respuesta → Estado=Enviado + Gmail Thread ID → Log_Ejecuciones con Resultado=OK",
+    "approved_false": "AT · Guardar Feedback (Intentos+1) → IF · Intentos < 2 → reintento con hint de reescritura, o TG · Escalar a Humano en el segundo rechazo",
+    "timeout": "A las 24 horas la ejecución se cierra sin enviar nada al cliente. El ticket queda en Esperando Aprobación."
+  }
+}

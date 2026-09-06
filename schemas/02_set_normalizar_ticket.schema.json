@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Salida de SET · Normalizar Ticket",
+  "description": "Objeto canónico interno del flujo. Todos los nodos posteriores lo referencian con $('SET · Normalizar Ticket').first().json. Garantiza tipo string en todos los campos para que las comparaciones de IF · Validar Payload sean type-safe.",
+  "type": "object",
+  "required": [
+    "nombre",
+    "email",
+    "empresa",
+    "plan",
+    "asunto",
+    "descripcion",
+    "run_id",
+    "recibido_en"
+  ],
+  "properties": {
+    "nombre": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string",
+      "description": "trim + toLowerCase aplicados"
+    },
+    "empresa": {
+      "type": "string"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "Free",
+        "Pro",
+        "Enterprise"
+      ],
+      "default": "Free"
+    },
+    "asunto": {
+      "type": "string"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string",
+      "description": "$execution.id de n8n. Correlaciona todos los registros de Log_Ejecuciones de una misma corrida."
+    },
+    "recibido_en": {
+      "type": "string",
+      "format": "date-time",
+      "description": "$now.toISO(). Base del cálculo de latencia end-to-end."
+    }
+  }
+}

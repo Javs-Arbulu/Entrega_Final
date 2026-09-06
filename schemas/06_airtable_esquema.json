@@ -1,0 +1,233 @@
+{
+  "titulo": "Esquema de la base Airtable · Mesa de Ayuda IA",
+  "descripcion": "Cuatro tablas vinculadas. Tickets es la tabla central: enlaza con Clientes (quién pregunta), Base_Conocimiento (qué se usó para responder) y Log_Ejecuciones (qué pasó en cada corrida).",
+  "relaciones": [
+    "Clientes 1 —— N Tickets   (campo Cliente en Tickets)",
+    "Base_Conocimiento N —— N Tickets   (campo Artículos KB en Tickets)",
+    "Tickets 1 —— N Log_Ejecuciones   (campo Ticket en Log_Ejecuciones)"
+  ],
+  "tablas": {
+    "Clientes": {
+      "rol": "Identidad del solicitante. Deduplicada por email mediante upsert.",
+      "campos": {
+        "Cliente": {
+          "tipo": "Single line text",
+          "primario": true
+        },
+        "Email": {
+          "tipo": "Email",
+          "clave_de_match": true
+        },
+        "Empresa": {
+          "tipo": "Single line text"
+        },
+        "Plan": {
+          "tipo": "Single select",
+          "opciones": [
+            "Free",
+            "Pro",
+            "Enterprise"
+          ]
+        },
+        "Tickets": {
+          "tipo": "Link to Tickets",
+          "espejo": true
+        }
+      }
+    },
+    "Base_Conocimiento": {
+      "rol": "Fuente de verdad para la redacción. El modelo no puede responder fuera de estos artículos.",
+      "campos": {
+        "Título": {
+          "tipo": "Single line text",
+          "primario": true
+        },
+        "Categoría": {
+          "tipo": "Single select",
+          "opciones": [
+            "Facturación",
+            "Bug técnico",
+            "Cómo hacer",
+            "Solicitud de función"
+          ]
+        },
+        "Contenido": {
+          "tipo": "Long text"
+        },
+        "Planes aplicables": {
+          "tipo": "Multiple select",
+          "opciones": [
+            "Free",
+            "Pro",
+            "Enterprise"
+          ]
+        },
+        "Tickets": {
+          "tipo": "Link to Tickets",
+          "espejo": true
+        }
+      },
+      "nota": "No existe la opción 'Fuera de alcance' porque ningún artículo responde a mensajes que no son soporte. El flujo los descarta antes de consultar la KB."
+    },
+    "Tickets": {
+      "rol": "Tabla central y máquina de estados del sistema.",
+      "campos": {
+        "Ticket ID": {
+          "tipo": "Formula",
+          "formula": "\"TCK-\" & RIGHT(\"0000\" & N, 4)",
+          "primario": true
+        },
+        "N": {
+          "tipo": "Autonumber"
+        },
+        "Asunto": {
+          "tipo": "Single line text",
+          "origen": "webhook"
+        },
+        "Descripción": {
+          "tipo": "Long text",
+          "origen": "webhook"
+        },
+        "Cliente": {
+          "tipo": "Link to Clientes",
+          "origen": "n8n"
+        },
+        "Estado": {
+          "tipo": "Single select",
+          "opciones": [
+            "Pendiente",
+            "Procesado por IA",
+            "Esperando Aprobación",
+            "Enviado",
+            "Rechazado",
+            "Error"
+          ],
+          "origen": "n8n"
+        },
+        "Categoría": {
+          "tipo": "Single select",
+          "opciones": [
+            "Facturación",
+            "Bug técnico",
+            "Cómo hacer",
+            "Solicitud de función",
+            "Fuera de alcance"
+          ],
+          "origen": "IA"
+        },
+        "Prioridad": {
+          "tipo": "Single select",
+          "opciones": [
+            "P1",
+            "P2",
+            "P3"
+          ],
+          "origen": "IA"
+        },
+        "Sentimiento": {
+          "tipo": "Single select",
+          "opciones": [
+            "Neutro",
+            "Frustrado",
+            "Enojado"
+          ],
+          "origen": "IA"
+        },
+        "Resumen IA": {
+          "tipo": "Long text",
+          "origen": "IA"
+        },
+        "Borrador Respuesta": {
+          "tipo": "Long text",
+          "origen": "IA"
+        },
+        "Confianza": {
+          "tipo": "Number",
+          "precision": 2,
+          "origen": "IA"
+        },
+        "Artículos KB": {
+          "tipo": "Link to Base_Conocimiento",
+          "origen": "n8n"
+        },
+        "Intentos IA": {
+          "tipo": "Number",
+          "entero": true,
+          "default": 0,
+          "rol": "filtro anti-bucle infinito"
+        },
+        "Feedback Humano": {
+          "tipo": "Long text",
+          "origen": "HITL"
+        },
+        "Gmail Thread ID": {
+          "tipo": "Single line text",
+          "origen": "Gmail"
+        },
+        "Fecha Envío": {
+          "tipo": "Date",
+          "con_hora": true
+        }
+      },
+      "maquina_de_estados": [
+        "Pendiente → Procesado por IA → Esperando Aprobación → Enviado",
+        "Pendiente → Procesado por IA → Rechazado   (categoría Fuera de alcance)",
+        "Esperando Aprobación → Rechazado → Esperando Aprobación   (reintento, máx 1 vez)",
+        "cualquier estado → Error   (fallo de validación, de API o de envío)"
+      ]
+    },
+    "Log_Ejecuciones": {
+      "rol": "Telemetría del sistema. Alimenta el dashboard de KPIs y la tasa de errores.",
+      "campos": {
+        "Run ID": {
+          "tipo": "Single line text",
+          "primario": true,
+          "origen": "$execution.id"
+        },
+        "Ticket": {
+          "tipo": "Link to Tickets"
+        },
+        "Nodo": {
+          "tipo": "Single line text",
+          "descripcion": "Nodo que originó el registro"
+        },
+        "Resultado": {
+          "tipo": "Single select",
+          "opciones": [
+            "OK",
+            "Error"
+          ]
+        },
+        "Modelo": {
+          "tipo": "Single select",
+          "opciones": [
+            "cohere",
+            "n-a"
+          ]
+        },
+        "Tokens In": {
+          "tipo": "Number",
+          "entero": true
+        },
+        "Tokens Out": {
+          "tipo": "Number",
+          "entero": true
+        },
+        "Costo USD": {
+          "tipo": "Number",
+          "precision": 6
+        },
+        "Latencia ms": {
+          "tipo": "Number",
+          "entero": true
+        },
+        "Mensaje Error": {
+          "tipo": "Long text"
+        },
+        "Timestamp": {
+          "tipo": "Created time"
+        }
+      }
+    }
+  }
+}
