@@ -167,24 +167,6 @@ curl -X POST "https://TU-INSTANCIA.app.n8n.cloud/webhook/ticket-nuevo" \
 
 Contrato completo del payload en [`schemas/01_webhook_entrada.schema.json`](schemas/01_webhook_entrada.schema.json).
 
----
-
-## Pruebas ejecutadas
-
-| #   | Caso                     | Resultado esperado                                       | Evidencia                                  |
-| --- | ------------------------ | -------------------------------------------------------- | ------------------------------------------ |
-| 1   | Ticket válido, aprobado  | Estado `Enviado`, email recibido, log con tokens y costo | `screenshots/02_corrida_aprobada.png`      |
-| 2   | Ticket válido, rechazado | Segundo borrador con enfoque distinto                    | `screenshots/04_reintento_rechazo.png`     |
-| 3   | Segundo rechazo          | Escalamiento a humano, corte del bucle                   | `screenshots/05_escalamiento.png`          |
-| 4   | Consulta de facturación  | Categoría `Facturación`, artículos correctos             | `screenshots/06_categoria_facturacion.png` |
-| 5   | Consulta comercial       | `Rechazado` sin llamar al modelo grande                  | `screenshots/07_fuera_de_alcance.png`      |
-| 6   | Payload inválido         | Log con los motivos de rechazo, sin ticket creado        | `screenshots/08_payload_invalido.png`      |
-| 7   | API key corrupta         | Ticket en `Error`, mensaje de la API registrado          | `screenshots/09_fallo_api.png`             |
-
-Los casos 5, 6 y 7 son el camino infeliz.
-
----
-
 ## Criterios de evaluación
 
 | #   | Criterio                          | Dónde se resuelve                             |
