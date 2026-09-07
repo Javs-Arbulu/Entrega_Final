@@ -8,11 +8,11 @@ Entrega Final del curso de Automatización e IA. Sistema que resuelve de extremo
 
 ## Enlaces obligatorios
 
-| Recurso                               | Enlace                                                                                                                                                                                                          |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Base de datos Airtable (modo lectura) | https://airtable.com/invite/l?inviteId=invBduRsF1xYd1DcG&inviteToken=3e556aee34953a815367bffabccf71442b48596ecba4c0013a1a988eb29b4b35&utm_medium=email&utm_source=product_team&utm_content=transactional-alerts |
-| Dashboard de control (Shared View)    |                                                                                                                                                                                                                 |
-| Documento de la entrega               | [docs/Entrega_Final.pdf](docs/Entrega_Final.pdf)                                                                                                                                                                |
+| Recurso                               | Enlace                                                   |
+| ------------------------------------- | -------------------------------------------------------- |
+| Base de datos Airtable (modo lectura) | https://airtable.com/app6VZNu6Sf0z8moD/shrwGB7MMp4VjjZk0 |
+| Dashboard de control (Shared View)    |                                                          |
+| Documento de la entrega               | [docs/Entrega_Final.pdf](docs/Entrega_Final.pdf)         |
 
 ---
 
@@ -152,7 +152,7 @@ El chat ID de Telegram se obtiene escribiéndole al bot y consultando `getUpdate
 ### 5. Disparar
 
 ```bash
-curl -X POST "https://TU-INSTANCIA.app.n8n.cloud/webhook/ticket-nuevo" \
+curl -X POST "https://arbulujavs.app.n8n.cloud/webhook/ticket-nuevo" \
   -H "Content-Type: application/json" \
   -H "x-api-key: TU_CLAVE" \
   -d '{
