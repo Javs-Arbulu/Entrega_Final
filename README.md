@@ -11,7 +11,6 @@ Entrega Final del curso de Automatización e IA. Sistema que resuelve de extremo
 | Recurso                               | Enlace                                                   |
 | ------------------------------------- | -------------------------------------------------------- |
 | Base de datos Airtable (modo lectura) | https://airtable.com/app6VZNu6Sf0z8moD/shrwGB7MMp4VjjZk0 |
-| Dashboard de control (Shared View)    |                                                          |
 | Documento de la entrega               | [docs/Entrega_Final.pdf](docs/Entrega_Final.pdf)         |
 
 ---
