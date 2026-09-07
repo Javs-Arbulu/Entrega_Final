@@ -167,6 +167,17 @@ curl -X POST "https://arbulujavs.app.n8n.cloud/webhook/ticket-nuevo" \
 
 Contrato completo del payload en [`schemas/01_webhook_entrada.schema.json`](schemas/01_webhook_entrada.schema.json).
 
+## Dashboard de control
+
+Cuatro vistas compartidas de Airtable, en modo lectura y sin contraseña. Cada una responde un indicador distinto del sistema.
+
+| Indicador                                                                                | Fuente            | Configuración                                         | Enlace                                                     |
+| ---------------------------------------------------------------------------------------- | ----------------- | ----------------------------------------------------- | ---------------------------------------------------------- |
+| **Tasa de errores por nodo** — qué proporción de corridas falla y en qué punto del flujo | `Log_Ejecuciones` | Filtrada por `Resultado = Error`, agrupada por `Nodo` | `https://airtable.com/app6VZNu6Sf0z8moD/shrCH4snmUoCb9vU3` |
+| **Estado operativo** — cuántos tickets hay en cada etapa y cuántos esperan aprobación    | `Tickets`         | Agrupada por `Estado`                                 | `https://airtable.com/app6VZNu6Sf0z8moD/shrzduIRwQl08pDJw` |
+| **Consumo y costo** — costo acumulado, tokens totales y latencia media                   | `Log_Ejecuciones` | Filtrada por `Resultado = OK`, con sumatorias         | `https://airtable.com/app6VZNu6Sf0z8moD/shrH0Szut5DqO0pYg` |
+| **Calidad del triage** — distribución de la clasificación y confianza media del modelo   | `Tickets`         | Agrupada por `Categoría`                              | `https://airtable.com/app6VZNu6Sf0z8moD/shrH0Szut5DqO0pYg` |
+
 ## Criterios de evaluación
 
 | #   | Criterio                          | Dónde se resuelve                             |
