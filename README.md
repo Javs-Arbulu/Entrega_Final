@@ -89,8 +89,8 @@ Cada tarea usa el modelo más barato capaz de resolverla.
 
 | Escenario                               | Ahorro     |
 | --------------------------------------- | ---------- |
-| Por ticket procesado completo           | **31,3 %** |
-| 1.000 tickets con 15 % fuera de alcance | **41,5 %** |
+| Por ticket procesado completo           | **38,6 %** |
+| 1.000 tickets con 15 % fuera de alcance | **47,7 %** |
 
 El segundo escenario suma el descarte temprano: un mensaje que no es soporte nunca llega al modelo caro. Cálculo detallado en la sección 3 del PDF.
 
